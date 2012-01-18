@@ -1,0 +1,111 @@
+2006-01-20  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/pr-15493.c (struct): New test for
+	savannah/15493
+
+2005-11-05  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/pr-13917.c: New test for savannah/13917.
+	* gcc.c-torture/execute-scz/b-20051105.c: New test.
+
+2005-05-08  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/compile-scz/pr-12572.c: Test case for savannah/12572.
+
+2005-04-03  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/pr-12297.c: Test case for savannah/12297.
+	* gcc.c-torture/execute-scz/pr-12243.c: New test for savannah/12243.
+	* gcc.c-torture/compile-scz/b-2005-02-14.c: New test.
+
+2005-02-13  Stephane Carrez  <stcarrez@nerim.fr>
+
+	PR target/16925
+	* gcc.c-torture/compile-scz/pr-16925.c: New test.
+
+	PR target/14629
+	* gcc.c-torture/compile-scz/pr-14629.cc: New test.
+
+2005-02-12  Stephane Carrez  <stcarrez@nerim.fr>
+
+	PR savannah/11903
+	* gcc.c-torture/compile-scz/pr-11903.c: New test.
+
+2005-01-30  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/pr-11741.c (strncpy): New test
+	for savannah/11741 
+
+2004-08-29  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/b-20040816.c: New file for
+	bug savannah/10207.
+
+2003-10-01  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.dg/20020219-1.c: Compile with -mshort to make sure integers
+	are 16-bit (test disabled as it defines a huge array).
+	* gcc.dg/20020426-2.c: Likewise.
+	* gcc.dg/20020430-1.c: Likewise.
+	* gcc.dg/20021018-1.c: Likewise.
+	* gcc.dg/20021029-1.c: Likewise.
+	* gcc.dg/20021023-1.c: -fpic is not supported on m6811/m6812.
+
+2003-09-30  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/compile/simd-5.x: Don't execute for 68HC11 because
+	it fails with 16-bit int.
+
+2003-08-02  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute-scz/execute.exp: New testsuite for 68hc11/hc12.
+	andqi.c, b-20020520.c, bitfield.c, malloc.c, negqi.c,
+	autoinc.c, bigmul.c, bset.c, memset-2003-01-25.c, orqi.c,
+	b-20010414.c, bit.c, mul-1.c, setjmp-test.c: New test for compilation
+	and execution.
+
+	* gcc.c-torture/compile-scz/compile.exp: New testsuite for 68hc11/hc12.
+	add_opt.c, b-20010920.c, b-20030518.c, di.c, orext.c, push.c,
+	string.c, addshift.c, b-20011203.c, b-20030519.c, foo.c, pr-1416.c,
+	ret64.c, tst-asm.c, alloca.c, b-20020203.c, b-2003-07-04.c,
+	fprintf.c, pr-6698.c, rotate.c, vsprintf.c, ashr.c, b-20020206.c,
+	b-2003-07-30.c, gcc-bug.c, pr-6744.c, sex.c, b-20000411.c,
+	b-20020403.c, bclr.c, interrupt.c, pr-7223.c, sext.c,
+	b-20001206.c, b-20020610.c, lshr.c, pr-7361.c,
+	shift-1.c, b-20010424.c, b-20021015.c, cp.c, min.c, printf.c
+	shl.c: New tests for compilation only.
+
+2003-07-20  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute/ieee/920810-1.x: New file, don't execute on
+	68HC11/HC12 because sprintf does not support floats.
+
+2003-07-20  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute/shiftdi.x: New file, don't execute this
+	test on 68HC11/HC12 as it relies on 32-bit ints.
+	* gcc.c-torture/execute/20021024-1.x: New file, likewise.
+
+2003-05-18  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.c-torture/execute/20020404-1.x: New file, don't run this
+	test on 68HC11/68HC12.
+
+2003-05-18  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* gcc.dg/20001009-1.c: -fpic is not supported on m6811-* and m6812-*
+	* gcc.dg/inline-2.c: Likewise.
+	* gcc.dg/20030225-1.c: Likewise.
+	* gcc.dg/20010912-1.c: Likewise.
+	* gcc.dg/20020122-4.c: Likewise.
+	* gcc.dg/20020415-1.c: Likewise.
+	* gcc.dg/20021116-1.c: Likewise.
+	* gcc.dg/20030213-1.c: Likewise.
+	* gcc.dg/20030120-1.c: Likewise.
+	* gcc.misc-tests/bprob.exp: Don't run on m6811-* and m6812-* since
+	the __bb_init_func are not available.
+
+2003-05-18  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* testsuite/gcc.c-torture/compile/20010327-1.x: New file, don't
+	run this test on m6811/m6812 as it assumes pointers are 32-bits.

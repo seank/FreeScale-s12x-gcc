@@ -1162,6 +1162,67 @@ UDItype __umulsidi3 (USItype, USItype);
 
 #endif /* __GNUC__ */
 
+#if defined(mc6811) || defined(mc6812)
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)				\
+  do {									\
+    __asm__ ("subd 2+%2\n"						\
+             "\txgdx\n"							\
+             "\tsbcb 1+%2\n"						\
+             "\tsbca %2\n"						\
+             "\txgdx" : "=D"((USItype) (sl))				\
+		      : "0"((USItype) (al)), "m"((USItype) (bl)));	\
+    /* Assumes that the carry is not modified. */			\
+    /* which is true since the reload instructions */			\
+    /* generated between the two __asm__ only do load/store.  */	\
+    __asm__ ("sbcb 3+%2\n"						\
+             "\tsbca 2+%2\n"						\
+             "\txgdx\n"							\
+             "\tsbcb 1+%2\n"						\
+             "\tsbca %2\n"						\
+             "\txgdx" : "=D"((USItype) (sh))				\
+		      : "0"((USItype) (ah)), "m"((USItype) (bh)));	\
+  } while (0)
+#if defined(mc6812)
+#define umul_ppmm(w1, w0, u, v)						\
+  do {									\
+    UWtype __x0, __x1, __x2, __x3;					\
+									\
+    __x0 = ((UWtype) ((UHItype) __ll_lowpart (u))) * ((UWtype) ((UHItype) __ll_lowpart (v)));	\
+    __x1 = ((UWtype) ((UHItype) __ll_lowpart (u))) * ((UWtype) ((UHItype) __ll_highpart (v)));	\
+    __x2 = ((UWtype) ((UHItype) __ll_highpart (u))) * ((UWtype) ((UHItype) __ll_lowpart (v)));	\
+    __x3 = ((UWtype) ((UHItype) __ll_highpart (u))) * ((UWtype) ((UHItype) __ll_highpart (v)));	\
+									\
+    __x1 += __ll_highpart (__x0);/* this can't give carry */		\
+    __x1 += __x2;		/* but this indeed can */		\
+    __asm__ ("bcc 1f\n"                                                 \
+	     "\tinx\n"							\
+	     "1:" : "=D"(__x3) : "0"(__x3));				\
+									\
+    (w1) = __x3 + __ll_highpart (__x1);					\
+    (w0) = __ll_lowpart (__x1) * __ll_B + __ll_lowpart (__x0);		\
+  } while (0)
+#else
+#define umul_ppmm(w1, w0, u, v)						\
+  do {									\
+    UWtype __x0, __x1, __x2, __x3;					\
+    extern UWtype __attribute__((near)) __mulhi32 (UHItype, UHItype);	\
+									\
+    __x0 = __mulhi32 (__ll_lowpart (u), __ll_lowpart (v));		\
+    __x1 = __mulhi32 (__ll_lowpart (u), __ll_highpart (v));		\
+    __x2 = __mulhi32 (__ll_highpart (u), __ll_lowpart (v));		\
+    __x3 = __mulhi32 (__ll_highpart (u), __ll_highpart (v));		\
+									\
+    __x1 += __ll_highpart (__x0);/* this can't give carry */		\
+    __x1 += __x2;		/* but this indeed can */		\
+    __asm__ ("bcc 1f\n"                                                 \
+	     "\tinx\n"							\
+	     "1:" : "=D"(__x3) : "0"(__x3));				\
+									\
+    (w1) = __x3 + __ll_highpart (__x1);					\
+    (w0) = __ll_lowpart (__x1) * __ll_B + __ll_lowpart (__x0);		\
+  } while (0)
+#endif
+#endif     
 /* If this machine has no inline assembler, use C macros.  */
 
 #if !defined (add_ssaaaa)
@@ -1232,6 +1293,45 @@ UDItype __umulsidi3 (USItype, USItype);
 #endif
 
 /* Define this unconditionally, so it can be used for debugging.  */
+#if defined(mc6811) || defined(mc6812)
+extern USItype __udivmodsi4(USItype num, USItype den, USItype* mod);
+
+#define __udiv_qrnnd_c(q, r, n1, n0, d) \
+  do {									\
+    USItype __d1, __d0, __q1, __q0;					\
+    USItype __r0, __m;						\
+    __d1 = __ll_highpart (d);						\
+    __d0 = __ll_lowpart (d);						\
+									\
+    __q1 = __udivmodsi4 (n1,__d1,&__r0);				\
+    __m = (USItype) __q1 * __d0;					\
+    __r0 = __r0 * __ll_B | __ll_highpart (n0);				\
+    if (__r0 < __m)							\
+      {									\
+	__q1--, __r0 += (d);						\
+	if (__r0 >= (d)) /* i.e. we didn't get carry when adding to __r0 */\
+	  if (__r0 < __m)						\
+	    __q1--, __r0 += (d);					\
+      }									\
+    __r0 -= __m;							\
+									\
+    __q0 = __udivmodsi4 (__r0,__d1,&__r0);				\
+    __m = (USItype) __q0 * __d0;					\
+    __r0 = __r0 * __ll_B | __ll_lowpart (n0);				\
+    if (__r0 < __m)							\
+      {									\
+	__q0--, __r0 += (d);						\
+	if (__r0 >= (d))						\
+	  if (__r0 < __m)						\
+	    __q0--, __r0 += (d);					\
+      }									\
+    __r0 -= __m;							\
+									\
+    (q) = (USItype) __q1 * __ll_B | __q0;				\
+    (r) = __r0;								\
+  } while (0)
+#else
+/* Define this unconditionally, so it can be used for debugging.  */
 #define __udiv_qrnnd_c(q, r, n1, n0, d) \
   do {									\
     UWtype __d1, __d0, __q1, __q0;					\
@@ -1268,6 +1368,7 @@ UDItype __umulsidi3 (USItype, USItype);
     (q) = (UWtype) __q1 * __ll_B | __q0;				\
     (r) = __r0;								\
   } while (0)
+#endif
 
 /* If the processor has no udiv_qrnnd but sdiv_qrnnd, go through
    __udiv_w_sdiv (defined in libgcc or elsewhere).  */

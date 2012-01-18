@@ -474,6 +474,15 @@ store_bit_field (str_rtx, bitsize, bitnum, fieldmode, value, total_size)
 	 result in an abort.  */
       fieldmode = smallest_mode_for_size (nwords * BITS_PER_WORD, MODE_INT);
 
+      /* When the value is a constant, the constant_subword applies a
+         correction on big endian targets.  If the bitfield contains less words
+         than the value (fieldmode), the constant that is extracted is shifted
+         by the word difference.  Example: bitfield = 33, fieldmode = DImode
+         and constant_subword extracts word 1 2 3 instead of 0 1 2.  */
+      int correction = 0;
+      if (WORDS_BIG_ENDIAN && CONSTANT_P (value))
+        correction = GET_MODE_BITSIZE (fieldmode) / BITS_PER_WORD - nwords;
+
       for (i = 0; i < nwords; i++)
 	{
 	  /* If I is 0, use the low-order word in both field and target;
@@ -488,7 +497,7 @@ store_bit_field (str_rtx, bitsize, bitnum, fieldmode, value, total_size)
 	  store_bit_field (op0, MIN (BITS_PER_WORD,
 				     bitsize - i * BITS_PER_WORD),
 			   bitnum + bit_offset, word_mode,
-			   operand_subword_force (value, wordnum,
+			   operand_subword_force (value, correction + wordnum,
 						  (GET_MODE (value) == VOIDmode
 						   ? fieldmode
 						   : GET_MODE (value))),
@@ -2142,7 +2151,7 @@ synth_mult (alg_out, t, cost_limit)
   if ((t & 1) == 0)
     {
       m = floor_log2 (t & -t);	/* m = number of low zero bits */
-      if (m < BITS_PER_WORD)
+      if (m < MAX_BITS_PER_WORD)
 	{
 	  q = t >> m;
 	  cost = shift_cost[m];
@@ -2227,7 +2236,7 @@ synth_mult (alg_out, t, cost_limit)
       unsigned HOST_WIDE_INT d;
 
       d = ((unsigned HOST_WIDE_INT) 1 << m) + 1;
-      if (t % d == 0 && t > d && m < BITS_PER_WORD)
+      if (t % d == 0 && t > d && m < MAX_BITS_PER_WORD)
 	{
 	  cost = MIN (shiftadd_cost[m], add_cost + shift_cost[m]);
 	  synth_mult (alg_in, t / d, cost_limit - cost);
@@ -2246,7 +2255,7 @@ synth_mult (alg_out, t, cost_limit)
 	}
 
       d = ((unsigned HOST_WIDE_INT) 1 << m) - 1;
-      if (t % d == 0 && t > d && m < BITS_PER_WORD)
+      if (t % d == 0 && t > d && m < MAX_BITS_PER_WORD)
 	{
 	  cost = MIN (shiftsub_cost[m], add_cost + shift_cost[m]);
 	  synth_mult (alg_in, t / d, cost_limit - cost);
@@ -2271,7 +2280,7 @@ synth_mult (alg_out, t, cost_limit)
       q = t - 1;
       q = q & -q;
       m = exact_log2 (q);
-      if (m >= 0 && m < BITS_PER_WORD)
+      if (m >= 0 && m < MAX_BITS_PER_WORD)
 	{
 	  cost = shiftadd_cost[m];
 	  synth_mult (alg_in, (t - 1) >> m, cost_limit - cost);
@@ -2290,7 +2299,7 @@ synth_mult (alg_out, t, cost_limit)
       q = t + 1;
       q = q & -q;
       m = exact_log2 (q);
-      if (m >= 0 && m < BITS_PER_WORD)
+      if (m >= 0 && m < MAX_BITS_PER_WORD)
 	{
 	  cost = shiftsub_cost[m];
 	  synth_mult (alg_in, (t + 1) >> m, cost_limit - cost);
@@ -2793,7 +2802,7 @@ expand_mult_highpart (mode, op0, cnst1, target, unsignedp, max_cost)
 
   /* expand_mult handles constant multiplication of word_mode
      or narrower.  It does a poor job for large modes.  */
-  if (size < BITS_PER_WORD
+  if (size < MAX_BITS_PER_WORD
       && mul_cost[(int) wider_mode] + shift_cost[size-1] < max_cost)
     {
       /* We have to do this, since expand_binop doesn't do conversion for
@@ -2824,7 +2833,7 @@ expand_mult_highpart (mode, op0, cnst1, target, unsignedp, max_cost)
 
   /* Secondly, same as above, but use sign flavor opposite of unsignedp.
      Need to adjust the result after the multiplication.  */
-  if (size - 1 < BITS_PER_WORD
+  if (size - 1 < MAX_BITS_PER_WORD
       && (mul_highpart_cost[(int) mode] + 2 * shift_cost[size-1] + 4 * add_cost
 	  < max_cost))
     {
@@ -2849,7 +2858,7 @@ expand_mult_highpart (mode, op0, cnst1, target, unsignedp, max_cost)
   /* Try widening the mode and perform a non-widening multiplication.  */
   moptab = smul_optab;
   if (smul_optab->handlers[(int) wider_mode].insn_code != CODE_FOR_nothing
-      && size - 1 < BITS_PER_WORD
+      && size - 1 < MAX_BITS_PER_WORD
       && mul_cost[(int) wider_mode] + shift_cost[size-1] < max_cost)
     {
       op1 = wide_op1;
@@ -2859,7 +2868,7 @@ expand_mult_highpart (mode, op0, cnst1, target, unsignedp, max_cost)
   /* Try widening multiplication of opposite signedness, and adjust.  */
   moptab = unsignedp ? smul_widen_optab : umul_widen_optab;
   if (moptab->handlers[(int) wider_mode].insn_code != CODE_FOR_nothing
-      && size - 1 < BITS_PER_WORD
+      && size - 1 < MAX_BITS_PER_WORD
       && (mul_widen_cost[(int) wider_mode]
 	  + 2 * shift_cost[size-1] + 4 * add_cost < max_cost))
     {
@@ -3199,7 +3208,7 @@ expand_divmod (rem_flag, code, mode, op0, op1, target, unsignedp)
 			  {
 			    rtx t1, t2, t3, t4;
 
-			    if (post_shift - 1 >= BITS_PER_WORD)
+			    if (post_shift - 1 >= MAX_BITS_PER_WORD)
 			      goto fail1;
 
 			    extra_cost = (shift_cost[post_shift - 1]
@@ -3226,8 +3235,8 @@ expand_divmod (rem_flag, code, mode, op0, op1, target, unsignedp)
 			  {
 			    rtx t1, t2;
 
-			    if (pre_shift >= BITS_PER_WORD
-				|| post_shift >= BITS_PER_WORD)
+			    if (pre_shift >= MAX_BITS_PER_WORD
+				|| post_shift >= MAX_BITS_PER_WORD)
 			      goto fail1;
 
 			    t1 = expand_shift (RSHIFT_EXPR, compute_mode, op0,
@@ -3363,8 +3372,8 @@ expand_divmod (rem_flag, code, mode, op0, op1, target, unsignedp)
 		      {
 			rtx t1, t2, t3;
 
-			if (post_shift >= BITS_PER_WORD
-			    || size - 1 >= BITS_PER_WORD)
+			if (post_shift >= MAX_BITS_PER_WORD
+			    || size - 1 >= MAX_BITS_PER_WORD)
 			  goto fail1;
 
 			extra_cost = (shift_cost[post_shift]
@@ -3393,8 +3402,8 @@ expand_divmod (rem_flag, code, mode, op0, op1, target, unsignedp)
 		      {
 			rtx t1, t2, t3, t4;
 
-			if (post_shift >= BITS_PER_WORD
-			    || size - 1 >= BITS_PER_WORD)
+			if (post_shift >= MAX_BITS_PER_WORD
+			    || size - 1 >= MAX_BITS_PER_WORD)
 			  goto fail1;
 
 			ml |= (~(unsigned HOST_WIDE_INT) 0) << (size - 1);
@@ -3480,8 +3489,8 @@ expand_divmod (rem_flag, code, mode, op0, op1, target, unsignedp)
 		    if (mh)
 		      abort ();
 
-		    if (post_shift < BITS_PER_WORD
-			&& size - 1 < BITS_PER_WORD)
+		    if (post_shift < MAX_BITS_PER_WORD
+			&& size - 1 < MAX_BITS_PER_WORD)
 		      {
 			t1 = expand_shift (RSHIFT_EXPR, compute_mode, op0,
 					   build_int_2 (size - 1, 0),
@@ -4135,8 +4144,12 @@ make_tree (type, x)
 
     case SIGN_EXTEND:
     case ZERO_EXTEND:
-      t = (*lang_hooks.types.type_for_mode) (GET_MODE (XEXP (x, 0)),
-					     GET_CODE (x) == ZERO_EXTEND);
+      if (CONSTANT_P (XEXP (x, 0)))
+        t = (*lang_hooks.types.type_for_mode) (GET_MODE (x),
+					       GET_CODE (x) == ZERO_EXTEND);
+      else
+        t = (*lang_hooks.types.type_for_mode) (GET_MODE (XEXP (x, 0)),
+					       GET_CODE (x) == ZERO_EXTEND);
       return fold (convert (type, make_tree (t, XEXP (x, 0))));
 
    default:

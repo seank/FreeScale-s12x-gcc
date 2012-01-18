@@ -3101,7 +3101,10 @@ rest_of_compilation (decl)
 	setjmp_args_warning ();
     }
 
-  if (optimize)
+  /* SCz: PR target/5854, this is initializing registers by inserting
+     instructions before the prologue instructions that save incomming
+     registers.  */
+  if (optimize && 0)
     {
       if (!flag_new_regalloc && initialize_uninitialized_subregs ())
 	{

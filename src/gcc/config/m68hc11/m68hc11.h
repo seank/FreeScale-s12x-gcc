@@ -1,22 +1,23 @@
 /* Definitions of target machine for GNU compiler.
    Motorola 68HC11 and 68HC12.
-   Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006 Free Software Foundation, Inc.
    Contributed by Stephane Carrez (stcarrez@nerim.fr)
 
-This file is part of GNU CC.
+This file is part of GCC.
 
-GNU CC is free software; you can redistribute it and/or modify
+GCC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
 
-GNU CC is distributed in the hope that it will be useful,
+GCC is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNU CC; see the file COPYING.  If not, write to
+along with GCC; see the file COPYING.  If not, write to
 the Free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
@@ -52,7 +53,7 @@ Note:
 #endif
 
 /* We need to tell the linker the target elf format.  Just pass an
-   emulation option.  This can be overriden by -Wl option of gcc.  */
+   emulation option.  This can be overridden by -Wl option of gcc.  */
 #ifndef LINK_SPEC
 #define LINK_SPEC                                               \
 "%{m68hc12:-m m68hc12elf}"                                      \
@@ -276,6 +277,10 @@ extern const struct processor_costs *m68hc11_cost;
 
 /* Define this if most significant word of a multiword number is numbered.  */
 #define WORDS_BIG_ENDIAN 	1
+
+/* Use a MAX_BITS_PER_WORD equivalent to SImode so that
+   several SI patterns can be used (mostly shift & add).  */
+/* #define MAX_BITS_PER_WORD       32  */
 
 /* Width of a word, in units (bytes).  */
 #define UNITS_PER_WORD		2
@@ -804,8 +809,8 @@ extern enum reg_class m68hc11_tmp_regs_class;
 /* A C expression that is nonzero if hard register number REGNO2 can be
    considered for use as a rename register for REGNO1 */
 
-#define HARD_REGNO_RENAME_OK(REGNO1,REGNO2) \
-  m68hc11_hard_regno_rename_ok ((REGNO1), (REGNO2))
+#define HARD_REGNO_RENAME_OK(REGNO1,REGNO2,MODE)            \
+  m68hc11_hard_regno_rename_ok ((REGNO1), (REGNO2), (MODE))
 
 /* A C expression whose value is nonzero if pseudos that have been
    assigned to registers of class CLASS would likely be spilled
@@ -874,7 +879,9 @@ extern enum reg_class m68hc11_tmp_regs_class;
 		 && VALUE == CONST0_RTX (GET_MODE (VALUE))) : 0) 
 
 /* 'U' represents certain kind of memory indexed operand for 68HC12.
-   and any memory operand for 68HC11.  */
+   and any memory operand for 68HC11.
+   'R' represents indexed addressing mode or access to page0 for 68HC11.
+   For 68HC12, it represents any memory operand.  */
 #define EXTRA_CONSTRAINT(OP, C)                         \
 ((C) == 'U' ? m68hc11_small_indexed_indirect_p (OP, GET_MODE (OP)) \
  : (C) == 'Q' ? m68hc11_symbolic_p (OP, GET_MODE (OP)) \
@@ -963,7 +970,7 @@ extern enum reg_class m68hc11_tmp_regs_class;
    followed by "to".  Eliminations of the same "from" register are listed
    in order of preference.
 
-   We have two registers that are eliminated on the 6811. The psuedo arg
+   We have two registers that are eliminated on the 6811. The pseudo arg
    pointer and pseudo frame pointer registers can always be eliminated;
    they are replaced with either the stack or the real frame pointer.  */
 
@@ -1215,7 +1222,7 @@ extern enum reg_class m68hc11_index_reg_class;
 
 
 /* Internal macro, return 1 if REGNO is a valid base register.  */
-#define REG_VALID_P(REGNO) (1)	/* ? */
+#define REG_VALID_P(REGNO) ((REGNO) >= 0)
 
 extern unsigned char m68hc11_reg_valid_for_base[FIRST_PSEUDO_REGISTER];
 #define REG_VALID_FOR_BASE_P(REGNO) \
@@ -1489,7 +1496,7 @@ extern unsigned char m68hc11_reg_valid_for_index[FIRST_PSEUDO_REGISTER];
    macro is used in only one place: `find_reloads_address' in reload.c.
 
    For M68HC11, we handle large displacements of a base register
-   by splitting the addend accors an addhi3 insn.
+   by splitting the addend across an addhi3 insn.
 
    For M68HC12, the 64K offset range is available.
    */
@@ -1690,7 +1697,7 @@ do {                                                                    \
 
 /* Assembler Commands for Exception Regions.  */
 
-/* Default values provided by GCC should be ok. Assumming that DWARF-2
+/* Default values provided by GCC should be ok. Assuming that DWARF-2
    frame unwind info is ok for this platform.  */
 
 #undef PREFERRED_DEBUGGING_TYPE
@@ -1719,6 +1726,12 @@ do {                                                                    \
 #define IMMEDIATE_PREFIX "#"
 #define GLOBAL_ASM_OP   "\t.globl\t"
 
+/* This is how to output a reference to a user-level label named NAME.
+   `assemble_name' uses this.  */
+#undef  ASM_OUTPUT_LABELREF
+#define ASM_OUTPUT_LABELREF(FILE, NAME) \
+  asm_fprintf (FILE, "%U%s", (*targetm.strip_name_encoding) (NAME))
+
 
 /* Miscellaneous Parameters.  */
 
@@ -1737,8 +1750,10 @@ do {                                                                    \
 {"m68hc11_shift_operator",   {ASHIFT, ASHIFTRT, LSHIFTRT, ROTATE, ROTATERT}},\
 {"m68hc11_eq_compare_operator", {EQ, NE}},                              \
 {"non_push_operand",         {SUBREG, REG, MEM}},			\
+{"splitable_operand",        {SUBREG, REG, MEM}},			\
 {"reg_or_some_mem_operand",  {SUBREG, REG, MEM}},			\
 {"tst_operand",              {SUBREG, REG, MEM}},			\
+{"nonimmediate_noinc_operand", {SUBREG, REG, MEM}},			\
 {"cmp_operand",              {SUBREG, REG, MEM, SYMBOL_REF, LABEL_REF,	\
 			     CONST_INT, CONST_DOUBLE}},
 

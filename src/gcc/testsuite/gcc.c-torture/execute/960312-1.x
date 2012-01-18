@@ -2,6 +2,6 @@
 # is uses an asm that requires two 32-bit registers (int).  It passes
 # when using -mshort because there are enough registers;  force -mshort.
 if { [istarget "m6811-*-*"] || [istarget "m6812-*-*"] } {
-	set options "-mshort"
+	set additional_flags "-mshort"
 }
 return 0

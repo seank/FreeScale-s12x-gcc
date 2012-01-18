@@ -102,6 +102,9 @@ note_sets (x, set, data)
   HARD_REG_SET *pset = (HARD_REG_SET *) data;
   unsigned int regno;
   int nregs;
+
+  if (GET_CODE (x) == SUBREG)
+    x = SUBREG_REG (x);
   if (GET_CODE (x) != REG)
     return;
   regno = REGNO (x);
@@ -292,6 +295,7 @@ regrename_optimize ()
 	  for (new_reg = 0; new_reg < FIRST_PSEUDO_REGISTER; new_reg++)
 	    {
 	      int nregs = HARD_REGNO_NREGS (new_reg, GET_MODE (*this->loc));
+              int mode = GET_MODE (*this->loc);
 
 	      for (i = nregs - 1; i >= 0; --i)
 	        if (TEST_HARD_REG_BIT (this_unavailable, new_reg + i)
@@ -307,7 +311,7 @@ regrename_optimize ()
 			&& !LEAF_REGISTERS[new_reg + i])
 #endif
 #ifdef HARD_REGNO_RENAME_OK
-		    || ! HARD_REGNO_RENAME_OK (reg + i, new_reg + i)
+		    || ! HARD_REGNO_RENAME_OK (reg + i, new_reg + i, mode)
 #endif
 		    )
 		  break;

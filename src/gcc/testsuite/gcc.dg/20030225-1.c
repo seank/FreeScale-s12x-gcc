@@ -5,7 +5,7 @@
    and Benjamin Herrenschmidt <benh@kernel.crashing.org>.  */
 /* { dg-do run } */
 /* { dg-options "-O2 -fPIC" } */
-/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* mmix-*-* } 0 } */
+/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* mmix-*-* m6811-*-* m6812-*-* } 0 } */
 
 
 extern void exit (int);

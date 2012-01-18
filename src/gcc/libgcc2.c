@@ -490,7 +490,12 @@ __udiv_w_sdiv (UWtype *rp __attribute__ ((__unused__)),
 
 #if (defined (L_udivdi3) || defined (L_divdi3) || \
      defined (L_umoddi3) || defined (L_moddi3))
-#define L_udivmoddi4
+#if !defined(mc6811) && !defined(mc6812)
+# define L_udivmoddi4
+#else
+extern UDWtype
+__udivmoddi4 (UDWtype n, UDWtype d, UDWtype *rp);
+#endif
 #endif
 
 #ifdef L_clz

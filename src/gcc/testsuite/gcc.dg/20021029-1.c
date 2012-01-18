@@ -2,6 +2,7 @@
    variables into writable sections.  */
 /* { dg-do compile } */
 /* { dg-options "-O2 -fpic" } */
+/* { dg-warning "not supported" "PIC unsupported" { target m6811-*-* m6812-*-* } 0 } */
 /* { dg-final { scan-assembler-not ".data.rel.ro.local" } } */
 
 int foo (int a)

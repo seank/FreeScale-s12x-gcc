@@ -1,7 +1,7 @@
 /* PR 7154 */
 /* { dg-do compile } */
 /* { dg-options "-O -fpic" } */
-/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* mmix-*-* } 0 } */
+/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* mmix-*-* m6811-*-* m6812-*-* } 0 } */
 
 const int x[1]={ 1 };
 void foo(int i, int *p)

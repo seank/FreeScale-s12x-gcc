@@ -571,7 +571,7 @@ verify_local_live_at_start (new_live_at_start, bb)
 	      fputs ("Old:\n", rtl_dump_file);
 	      dump_bb (bb, rtl_dump_file);
 	    }
-	  abort ();
+	  // SCz: abort ();
 	}
     }
   else

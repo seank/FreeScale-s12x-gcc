@@ -4216,6 +4216,20 @@ find_reloads (insn, replace, ind_levels, live_known, reload_reg_p)
 
       if (goal_alternative_matches[rld[i].opnum] >= 0)
 	rld[i].opnum = goal_alternative_matches[rld[i].opnum];
+
+      /* If an operand's reload is RELOAD_OTHER, change any
+         RELOAD_FOR_OPERAND_ADDRESS and RELOAD_FOR_OUTPUT_ADDRESS reloads
+         of that operand to RELOAD_FOR_OTHER_ADDRESS.  This is necessary
+         to make sure the reloads are emitted in the good order.  We only need
+         to scan backward.  */
+      if (rld[i].when_needed == RELOAD_OTHER
+          && rld[i].optional == 0)
+        {
+          for (j = i - 1; j >= 0; j--)
+            if (rld[j].opnum == rld[i].opnum
+                && rld[j].when_needed == RELOAD_FOR_OPERAND_ADDRESS)
+              rld[j].when_needed = RELOAD_FOR_OTHER_ADDRESS;
+        }
     }
 
   /* Scan all the reloads, and check for RELOAD_FOR_OPERAND_ADDRESS reloads.
@@ -4556,10 +4570,8 @@ find_reloads_toplev (x, opnum, type, ind_levels, is_set_dest, insn,
 	 force a reload in that case.  So we should not do anything here.  */
 
       else if (regno >= FIRST_PSEUDO_REGISTER
-#ifdef LOAD_EXTEND_OP
 	       && (GET_MODE_SIZE (GET_MODE (x))
 		   <= GET_MODE_SIZE (GET_MODE (SUBREG_REG (x))))
-#endif
 	       && (reg_equiv_address[regno] != 0
 		   || (reg_equiv_mem[regno] != 0
 		       && (! strict_memory_address_p (GET_MODE (x),
@@ -5913,7 +5925,7 @@ find_reloads_subreg_address (x, force_replace, opnum, type,
 		}
 
 	      find_reloads_address (GET_MODE (tem), &tem, XEXP (tem, 0),
-				    &XEXP (tem, 0), opnum, ADDR_TYPE (type),
+				    &XEXP (tem, 0), opnum, type,
 				    ind_levels, insn);
 
 	      /* If this is not a toplevel operand, find_reloads doesn't see

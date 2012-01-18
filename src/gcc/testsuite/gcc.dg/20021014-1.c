@@ -9,6 +9,7 @@
 /* Support for -p on irix relies on libprof1.a which doesn't appear to
    exist on any irix6 system currently posting testsuite results.  */
 /* { dg-error "libprof1.a" "Profiler support missing" { target mips*-*-irix* } 0 } */
+/* { dg-error "mcount" "Profiler support missing" { target m6811-*-* m6812-*-* } 0 } */
 
 extern void abort (void);
 extern void exit (int);

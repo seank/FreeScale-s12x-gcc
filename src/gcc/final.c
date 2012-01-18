@@ -2909,7 +2909,22 @@ alter_subreg (xp)
   /* simplify_subreg does not remove subreg from volatile references.
      We are required to.  */
   if (GET_CODE (y) == MEM)
-    *xp = adjust_address (y, GET_MODE (x), SUBREG_BYTE (x));
+    {
+      unsigned outer_size = GET_MODE_SIZE (GET_MODE (x));
+      unsigned inner_size = GET_MODE_SIZE (GET_MODE (y));
+      int offset = SUBREG_BYTE (x);
+      
+      /* If this is a paradoxical subreg with a SUBREG_BYTE set
+         to 0 we must adjust the offset for big-endian machines
+         (otherwise we take the address of the high part).  */
+      if (BYTES_BIG_ENDIAN && !offset && outer_size > inner_size)
+        {
+          offset += MIN (inner_size, UNITS_PER_WORD);
+          offset -= MIN (outer_size, UNITS_PER_WORD);
+        }
+
+      *xp = adjust_address (y, GET_MODE (x), offset);
+    }
   else
     {
       rtx new = simplify_subreg (GET_MODE (x), y, GET_MODE (y),

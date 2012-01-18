@@ -1,4 +1,4 @@
-#   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+#   Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 # Some targets don't have any implementation of __bb_init_func or are
 # missing other needed machinery.
 if { [istarget mmix-*-*]
-     || [istarget cris-*-*] } {
+     || [istarget cris-*-*]
+     || [istarget m6811-*-*]
+     || [istarget m6812-*-*] } {
     return
 }
 

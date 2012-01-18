@@ -76,10 +76,14 @@ const struct default_include cpp_include_defaults[]
 
 #ifdef GCC_INCLUDE_DIR
 const char cpp_GCC_INCLUDE_DIR[] = GCC_INCLUDE_DIR;
+#if GNU_HC1X_DONT_PATCH
 const size_t cpp_GCC_INCLUDE_DIR_len = sizeof GCC_INCLUDE_DIR - 8;
+#endif
 #else
 const char cpp_GCC_INCLUDE_DIR[] = "";
+#if GNU_HC1X_DONT_PATCH
 const size_t cpp_GCC_INCLUDE_DIR_len = 0;
+#endif
 #endif
 
 #ifdef TARGET_SYSTEM_ROOT

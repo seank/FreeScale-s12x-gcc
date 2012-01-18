@@ -1,14 +1,18 @@
-long udivmodsi4 ();
+extern unsigned long __udivmodsi4 (unsigned long num, unsigned long den,
+                                   unsigned long *mod);
 
-long
-__udivsi3 (long a, long b)
+unsigned long
+__udivsi3 (unsigned long a, unsigned long b)
 {
-  return udivmodsi4 (a, b, 0);
+  return __udivmodsi4 (a, b, 0);
 }
 
-long
-__umodsi3 (long a, long b)
+unsigned long
+__umodsi3 (unsigned long a, unsigned long b)
 {
-  return udivmodsi4 (a, b, 1);
+  unsigned long mod;
+
+  __udivmodsi4 (a, b, &mod);
+  return mod;
 }
 

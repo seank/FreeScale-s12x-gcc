@@ -3513,8 +3513,7 @@ handle_avail_expr (insn, expr)
       /* ??? If the change fails, we return 0, even though we created
 	 an insn.  I think this is ok.  */
       new_insn
-	= emit_insn_after (gen_rtx_SET (VOIDmode, to,
-					SET_DEST (expr_set)),
+	= emit_insn_after (gen_move_insn (to, SET_DEST (expr_set)),
 			   insn_computes_expr);
 
       /* Keep register set table up to date.  */
@@ -3525,7 +3524,7 @@ handle_avail_expr (insn, expr)
 	{
 	  fprintf (gcse_file, "GCSE: Creating insn %d to copy value of reg %d",
 		   INSN_UID (NEXT_INSN (insn_computes_expr)),
-		   REGNO (SET_SRC (PATTERN (NEXT_INSN (insn_computes_expr)))));
+		   REGNO (SET_DEST (expr_set)));
 	  fprintf (gcse_file, ", computed in insn %d,\n",
 		   INSN_UID (insn_computes_expr));
 	  fprintf (gcse_file, "      into newly allocated reg %d\n",

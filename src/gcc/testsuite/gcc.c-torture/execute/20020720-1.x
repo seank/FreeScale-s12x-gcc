@@ -29,7 +29,7 @@ set torture_eval_before_compile {
     set compiler_conditional_xfail_data {
         "This test fails to optimize completely on certain platforms." \
         { "xtensa-*-*" "sh-*-*" "arm*-*-*" "strongarm*-*-*" "xscale*-*-*" \
-	  "h8300*-*-*" "x86_64-*-*" "cris-*-*" } \
+	  "h8300*-*-*" "x86_64-*-*" "cris-*-*" "m6811-*-*" "m6812-*-*" } \
         { "*" } \
         { "-O0" }
     }

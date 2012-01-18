@@ -8,6 +8,7 @@
 /* { dg-do run } */
 /* { dg-options "-O2" } */
 /* { dg-options "-O2 -mdisable-indexing" { target hppa*-*-hpux* } } */
+/* { dg-options "-mshort" { target m6811-*-* m6812-*-* } } */
 
 /* Disable the test entirely for 16-bit targets.  */
 #if __INT_MAX__ > 32767

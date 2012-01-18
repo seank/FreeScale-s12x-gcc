@@ -3,8 +3,8 @@
 typedef struct { int i; } FILE;
 typedef __SIZE_TYPE__ size_t;
 int fputs (const char *, FILE *);
-void bzero (void *, size_t);
-int bcmp (const void *, const void *, size_t);
+void bzero (void *, size_t); /* { dg-warning "conflicting types for built-in" { target m6811-*-* } } */
+int bcmp (const void *, const void *, size_t); /* { dg-warning "conflicting types for built-in" { target m6811-*-* } } */
 
 char buf[32];
 FILE *f;

@@ -74,6 +74,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef REAL_STRIP_FILE_NAME
 #endif
 
+#ifdef WIN32
+# define USE_POPEN
+#endif
+
 /* If we cannot use a special method, use the ordinary one:
    run nm to find what symbols are present.
    In a cross-compiler, this means you need a cross nm,
@@ -444,7 +448,11 @@ handler (signo)
 #endif
 
   signal (signo, SIG_DFL);
+#ifndef WIN32
   kill (getpid (), signo);
+#else
+  exit(3);
+#endif
 }
 
 
@@ -1572,7 +1580,7 @@ collect_execute (prog, argv, redir)
   if (redir)
     {
       /* Open response file.  */
-      redir_handle = open (redir, O_WRONLY | O_TRUNC | O_CREAT);
+      redir_handle = open (redir, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 
       /* Duplicate the stdout and stderr file handles
 	 so they can be restored later.  */
@@ -2081,6 +2089,31 @@ scan_prog_file (prog_name, which_pass)
   if (nm_file_name == 0)
     fatal ("cannot find `nm'");
 
+#ifdef USE_POPEN
+  p = (char*) xmalloc (strlen (nm_file_name)
+                       + strlen (NM_FLAGS)
+                       + strlen (prog_name)
+                       + 10);
+  strcpy (p, nm_file_name);
+  strcat (p, " ");
+  if (NM_FLAGS[0] != '\0')
+    {
+      strcat (p, NM_FLAGS);
+      strcat (p, " ");
+    }
+  strcat (p, prog_name);
+  inf = popen (p, "r");
+  if (inf == NULL)
+    fatal_perror ("can't popen `%s'", p);
+
+  /* Trace if needed.  */
+  if (vflag)
+    fprintf (stderr, " %s\n", p);
+
+  free (p);
+  fflush (stdout);
+  fflush (stderr);
+#else
   nm_argv[argc++] = nm_file_name;
   if (NM_FLAGS[0] != '\0')
     nm_argv[argc++] = NM_FLAGS;
@@ -2142,6 +2175,7 @@ scan_prog_file (prog_name, which_pass)
 
   if (debug)
     fprintf (stderr, "\nnm output with constructors/destructors.\n");
+#endif
 
   /* Read each line of nm output.  */
   while (fgets (buf, sizeof buf, inf) != (char *) 0)
@@ -2215,7 +2249,11 @@ scan_prog_file (prog_name, which_pass)
   if (fclose (inf) != 0)
     fatal_perror ("fclose");
 
+#ifdef USE_POPEN
+  pclose (inf);
+#else
   do_wait (nm_file_name);
+#endif
 
   signal (SIGINT,  int_handler);
 #ifdef SIGQUIT

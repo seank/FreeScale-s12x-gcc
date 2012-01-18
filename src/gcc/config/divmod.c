@@ -1,4 +1,5 @@
-long udivmodsi4 ();
+extern unsigned long __udivmodsi4 (unsigned long num, unsigned long den,
+                                   unsigned long *mod);
 
 long
 __divsi3 (long a, long b)
@@ -18,7 +19,7 @@ __divsi3 (long a, long b)
       neg = !neg;
     }
 
-  res = udivmodsi4 (a, b, 0);
+  res = __udivmodsi4 (a, b, 0);
 
   if (neg)
     res = -res;
@@ -41,7 +42,7 @@ __modsi3 (long a, long b)
   if (b < 0)
     b = -b;
 
-  res = udivmodsi4 (a, b, 1);
+  __udivmodsi4 (a, b, (unsigned long*) &res);
 
   if (neg)
     res = -res;

@@ -79,7 +79,7 @@ _start:
 ;; 
 ;;	int __premain(void);
 ;; 
-	jsr	__premain
+	bsr	__premain
 	
 ;;
 ;; 

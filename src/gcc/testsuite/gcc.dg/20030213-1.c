@@ -1,7 +1,7 @@
 /* Testcase for http://gcc.gnu.org/ml/gcc-patches/2003-02/msg01017.html */
 /* { dg-do link } */
 /* { dg-options "-O -fpic" } */
-/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* } 0 } */
+/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* m6811-*-* m6812-*-* } 0 } */
 
 int *g;
 

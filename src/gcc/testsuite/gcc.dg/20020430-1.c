@@ -6,6 +6,7 @@
 
 /* { dg-do compile } */
 /* { dg-options "-O2 -frename-registers -fpic" } */
+/* { dg-warning "not supported" "PIC unsupported" { target m6811-*-* m6812-*-* } 0 } */
 
 typedef unsigned long XID;
 typedef XID Window;

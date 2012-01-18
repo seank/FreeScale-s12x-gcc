@@ -3,6 +3,7 @@
 /* { dg-do run } */
 /* { dg-options "-O2" } */
 /* { dg-options "-O2 -frename-registers -fomit-frame-pointer -fPIC -mcpu=i686" { target i?86-*-* } } */
+/* { dg-warning "not supported" "PIC unsupported" { target m6811-*-* m6812-*-* } 0 } */
 
 typedef struct
 {

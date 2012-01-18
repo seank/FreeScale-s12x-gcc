@@ -1,0 +1,4 @@
+2003-05-18  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* configure.in (m68hc11): Configure libstdcxx_version.
+

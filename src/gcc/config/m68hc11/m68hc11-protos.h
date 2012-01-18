@@ -1,5 +1,6 @@
 /* Prototypes for exported functions defined in m68hc11.c
-   Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2003,
+   2005, 2006 Free Software Foundation, Inc.
    Contributed by Stephane Carrez (stcarrez@nerim.fr)
 
 This file is part of GNU CC.
@@ -24,7 +25,7 @@ extern int m68hc11_override_options PARAMS((void));
 extern int m68hc11_optimization_options PARAMS((int,int));
 extern void m68hc11_conditional_register_usage PARAMS((void));
 extern int hard_regno_mode_ok PARAMS((int, enum machine_mode));
-extern int m68hc11_hard_regno_rename_ok PARAMS((int, int));
+extern int m68hc11_hard_regno_rename_ok PARAMS((int, int, int));
 
 extern int m68hc11_total_frame_size PARAMS((void));
 extern int m68hc11_initial_frame_pointer_offset PARAMS((void));
@@ -105,6 +106,7 @@ extern int go_if_legitimate_address2 PARAMS((rtx, enum machine_mode, int));
 extern int reg_or_indexed_operand PARAMS((rtx,enum machine_mode));
 extern int tst_operand PARAMS((rtx,enum machine_mode));
 extern int cmp_operand PARAMS((rtx,enum machine_mode));
+extern int nonimmediate_noinc_operand PARAMS((rtx,enum machine_mode));
 extern int memory_indexed_operand PARAMS((rtx, enum machine_mode));
 
 extern void m68hc11_split_logical PARAMS((enum machine_mode, int, rtx*));
@@ -147,6 +149,7 @@ extern void m68hc11_function_epilogue PARAMS((FILE*,int));
 
 extern int m68hc11_is_far_symbol PARAMS((rtx));
 extern int m68hc11_is_trap_symbol PARAMS((rtx));
+extern int m68hc11_page0_symbol_p (rtx x);
 
 #endif /* TREE_CODE */
 

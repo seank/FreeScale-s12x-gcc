@@ -2,7 +2,7 @@
    (mem (lo_sum pic (symbol_ref))) within an asm at the right time.  */
 /* { dg-do compile } */
 /* { dg-options "-O2 -fpic" } */
-/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* } 0 } */
+/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* m6811-*-* m6812-*-* } 0 } */
 
 void foo()
 {

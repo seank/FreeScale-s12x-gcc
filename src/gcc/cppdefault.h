@@ -67,7 +67,17 @@ struct default_include
 
 extern const struct default_include cpp_include_defaults[];
 extern const char cpp_GCC_INCLUDE_DIR[];
+
+/* Don't use sizeof GCC_INCLUDE_DIR because for Mingw32 we patch the
+   executable to replace this path with the good path.  We must then
+   use strlen() to find the correct length.  */
+#undef GNU_HC1X_DONT_PATCH
+#if GNU_HC1X_DONT_PATCH
 extern const size_t cpp_GCC_INCLUDE_DIR_len;
+#else
+#define cpp_GCC_INCLUDE_DIR_len \
+(strlen (cpp_GCC_INCLUDE_DIR) > 7 ? strlen (cpp_GCC_INCLUDE_DIR) - 7 : 0)
+#endif
 
 extern const char *cpp_SYSROOT;
 

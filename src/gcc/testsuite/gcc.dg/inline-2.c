@@ -2,7 +2,7 @@
    it has been deferred.  */
 /* { dg-do compile } */
 /* { dg-options "-O3 -finline-limit=0 -fpic" } */
-/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* } 0 } */
+/* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* m6811-*-* m6812-*-* } 0 } */
 
 static int foo(void)
 {

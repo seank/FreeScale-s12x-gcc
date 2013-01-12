@@ -35,6 +35,10 @@ Boston, MA 02111-1307, USA.  */
 
 	.file "larith.asm"
 
+#if !defined(mc68hc11) && !defined(mc68hc12) && !defined(m9s12x)
+  #error No target defined for larith.asm
+#endif
+
 #ifdef __HAVE_SHORT_INT__
 	.mode mshort
 #else
@@ -402,18 +406,30 @@ End:
 	std	6,y			; Save, borrow preserved
 
 	ldd	ARG(6),x
+#if defined(m9s12x)
+    sbed    ARG(14),x
+#else
 	sbcb	ARG(15),x
 	sbca	ARG(14),x
+#endif
 	std	4,y
 
 	ldd	ARG(4),x
+#if defined(m9s12x)
+	sbed	ARG(12),x
+#else
 	sbcb	ARG(13),x
 	sbca	ARG(12),x
+#endif
 	std	2,y
 	
 	ldd	ARG(2),x		; Subtract MSB
+#if defined(m9s12x)
+	sbed	ARG(10),x
+#else
 	sbcb	ARG(11),x
 	sbca	ARG(10),x
+#endif
 	std	0,y
 
 	xgdy			;
@@ -469,10 +485,14 @@ done:
 
 	comb
 	coma
+#if defined(m9s12x)
+    comx
+#else
 	xgdx
 	comb
 	coma
 	xgdx
+#endif
 	rts
 #endif
 	
@@ -486,10 +506,14 @@ done:
 	beq	Return
 Loop:
 	lsld
+#if defined(m9s12x)
+    rolx
+#else
 	xgdx
 	rolb
 	rola
 	xgdx
+#endif
 	dey
 	bne	Loop
 Return:
@@ -505,10 +529,14 @@ Return:
 	xgdy
 	beq	Return
 Loop:
+#if defined(m9s12x)
+    asrx
+#else
 	xgdx
 	asra
 	rorb
 	xgdx
+#endif
 	rora
 	rorb
 	dey
@@ -526,9 +554,13 @@ Return:
 	xgdy
 	beq	Return
 Loop:
+#if defined(m9s12x)
+    lsrx
+#else
 	xgdx
 	lsrd
 	xgdx
+#endif
 	rora
 	rorb
 	dey
@@ -579,10 +611,14 @@ Return_zero:
 	declare_near ___rotrhi3
 
 ___rotrhi3:
+#if defined(m9s12x)
+    andx    #0x000f
+#else
 	xgdx
 	clra
 	andb	#0x0f
 	xgdx
+#endif
 	beq	Return
 Loop:
 	tap
@@ -598,10 +634,14 @@ Return:
 	declare_near ___rotlhi3
 
 ___rotlhi3:
+#if defined(m9s12x)
+    andx    #0x000f
+#else
 	xgdx
 	clra
 	andb	#0x0f
 	xgdx
+#endif
 	beq	Return
 Loop:
 	asrb
@@ -951,6 +991,9 @@ Ret:
 	declare	__mulsi3
 
 #ifdef mc68hc12
+
+
+	
 	pshd				; Save A.low
 	ldy	ARG(4),sp
 	emul				; A.low * B.high

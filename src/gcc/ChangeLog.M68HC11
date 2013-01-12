@@ -1,3 +1,14 @@
+2010-10-28 James Murray <jsm@jsm-net.demon.co.uk>
+    More work on 9s12x target building
+    S12X optimisations in larith.asm
+
+2010-10-26 James Murray <jsm@jsm-net.demon.co.uk>
+    Bump version
+    Include A.E.Smith S12X ldivmod.asm assembler long division
+    Port ldivmod.asm to S12
+    (Earlier work)
+    Support building as 9S12X target to match binutils
+
 2006-01-22  Stephane Carrez  <stcarrez@nerim.fr>
 
 	* version.c: Bump to 2006-01-22

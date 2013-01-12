@@ -42,12 +42,14 @@ Note:
 
 #undef ENDFILE_SPEC
 
-/* Compile and assemble for a 68hc11 unless there is a -m68hc12 option.  */
+/* Default to compile and assemble for a 68hc11 */
+/* convert parameter style from 'cc1' to 'as' */
 #ifndef ASM_SPEC
 #define ASM_SPEC                                                \
 "%{m68hc12:-m68hc12}"                                           \
 "%{m68hcs12:-m68hcs12}"                                         \
-"%{!m68hc12:%{!m68hcs12:-m68hc11}} "                            \
+"%{m9s12x:-mm9s12x}"                                             \
+"%{!m68hc12:%{!m68hcs12:%{!m9s12x:-m68hc11}}} "                 \
 "%{mshort:-mshort}%{!mshort:-mlong} "                           \
 "%{fshort-double:-mshort-double}%{!fshort-double:-mlong-double}"
 #endif
@@ -58,8 +60,10 @@ Note:
 #define LINK_SPEC                                               \
 "%{m68hc12:-m m68hc12elf}"                                      \
 "%{m68hcs12:-m m68hc12elf}"                                     \
-"%{!m68hc12:%{!m68hcs12:-m m68hc11elf}} "                       \
-"%{!mnorelax:%{!m68hc12:%{!m68hcs12:-relax}}}"
+"%{m9s12x:-m m9s12x}"                                           \
+"%{!m68hc12:%{!m68hcs12:%{!m9s12x:-m m68hc11elf}}} "            \
+"%{!mnorelax:%{!m68hc12:%{!m68hcs12:%{!m9s12x:-relax}}}}"
+
 #endif
 
 #ifndef LIB_SPEC
@@ -76,7 +80,8 @@ Note:
  %{!mshort:-D__INT__=32}\
  %{m68hc12:-Dmc6812 -DMC6812 -Dmc68hc12}\
  %{m68hcs12:-Dmc6812 -DMC6812 -Dmc68hcs12}\
- %{!m68hc12:%{!m68hcs12:-Dmc6811 -DMC6811 -Dmc68hc11}}\
+ %{m9s12x:-Dmc6812 -DMC6812 -Dmc68hc12 -Dmc68hcs12 -Dm9s12x -m9s12x}\
+ %{!m68hc12:%{!m68hcs12:%{!m9s12x:-Dmc6811 -DMC6811 -Dmc68hc11}}}\
  %{fshort-double:-D__HAVE_SHORT_DOUBLE__}\
  %{mlong-calls:-D__USE_RTC__}"
 #endif
@@ -85,7 +90,9 @@ Note:
 #define STARTFILE_SPEC "crt1%O%s"
 
 /* Names to predefine in the preprocessor for this target machine.  */
-#define CPP_PREDEFINES		"-Dmc68hc1x"
+#ifndef CPP_PREDEFINES
+#define CPP_PREDEFINES		"-Dmc68hc1x -Dtarget11"
+#endif
 
 /* As an embedded target, we have no libc.  */
 #define inhibit_libc
@@ -126,20 +133,22 @@ extern short *reg_renumber;	/* def in local_alloc.c */
  * with -mauto-incdec.
  */
 
-#define MASK_SHORT              0002	/* Compile with 16-bit `int' */
-#define MASK_AUTO_INC_DEC       0004
-#define MASK_M6811              0010
-#define MASK_M6812              0020
-#define MASK_M68S12             0040
-#define MASK_NO_DIRECT_MODE     0100
-#define MASK_MIN_MAX            0200
-#define MASK_LONG_CALLS         0400
+#define MASK_SHORT              0x0002	/* Compile with 16-bit `int' */
+#define MASK_AUTO_INC_DEC       0x0004    /* FIXME - tidy M68XX flags order */
+#define MASK_M6811              0x0010
+#define MASK_M6812              0x0020
+#define MASK_M68S12             0x0040
+#define MASK_NO_DIRECT_MODE     0x0100
+#define MASK_MIN_MAX            0x0200
+#define MASK_LONG_CALLS         0x0400
+#define MASK_M68S12X            0x0800
 
 #define TARGET_OP_TIME		(optimize && optimize_size == 0)
 #define TARGET_SHORT            (target_flags & MASK_SHORT)
 #define TARGET_M6811            (target_flags & MASK_M6811)
 #define TARGET_M6812            (target_flags & MASK_M6812)
 #define TARGET_M68S12           (target_flags & MASK_M68S12)
+#define TARGET_M68S12X          (!(target_flags & MASK_M6811) && (target_flags & MASK_M68S12X)) 
 #define TARGET_AUTO_INC_DEC     (target_flags & MASK_AUTO_INC_DEC)
 #define TARGET_MIN_MAX          (target_flags & MASK_MIN_MAX)
 #define TARGET_NO_DIRECT_MODE   (target_flags & MASK_NO_DIRECT_MODE)
@@ -162,6 +171,7 @@ extern short *reg_renumber;	/* def in local_alloc.c */
 #  define MULTILIB_DEFAULTS { "m68hc12" }
 # endif
 #endif
+/* 9s12x in own .h */
 
 /* Macro to define tables used to set the flags. This is a list in braces of
    pairs in braces, each pair being { "NAME", VALUE } where VALUE is the bits
@@ -201,6 +211,10 @@ extern short *reg_renumber;	/* def in local_alloc.c */
     N_("Compile for a 68HC12")},				\
   { "68S12",  MASK_M6812 | MASK_M68S12,				\
     N_("Compile for a 68HCS12")},				\
+  { "9s12x",  MASK_M6812 | MASK_M68S12 | MASK_M68S12X,		\
+    N_("Compile for CPU12X")},				\
+  { "m9s12x",  MASK_M6812 | MASK_M68S12 | MASK_M68S12X,		\
+    N_("Compile for CPU12X")},				\
   { "", TARGET_DEFAULT, 0 }}
 
 /* This macro is similar to `TARGET_SWITCHES' but defines names of
@@ -233,7 +247,7 @@ extern const char *m68hc11_soft_reg_count;
 #endif
 
 /* Print subsidiary information on the compiler version in use.  */
-#define TARGET_VERSION	fprintf (stderr, " (MC68HC11/MC68HC12/MC68HCS12)")
+#define TARGET_VERSION	fprintf (stderr, " (MC68HC11/MC68HC12/MC68HCS12/M9S12X)")
 
 /* Sometimes certain combinations of command options do not make
    sense on a particular target machine.  You can define a macro

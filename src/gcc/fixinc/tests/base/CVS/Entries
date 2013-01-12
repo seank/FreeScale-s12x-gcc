@@ -1,0 +1,47 @@
+/_G_config.h/1.1/Wed May  2 15:46:34 2012//
+/assert.h/1.1/Wed May  2 15:46:34 2012//
+/c_asm.h/1.1/Wed May  2 15:46:34 2012//
+/ctrl-quotes-def-1.h/1.1/Wed May  2 15:46:34 2012//
+/ctype.h/1.1/Wed May  2 15:46:34 2012//
+/curses.h/1.1/Wed May  2 15:46:34 2012//
+/fcntl.h/1.1/Wed May  2 15:46:34 2012//
+/fixinc-test-limits.h/1.1/Wed May  2 15:46:34 2012//
+/inttypes.h/1.1/Wed May  2 15:46:34 2012//
+/io-quotes-def-1.h/1.1/Wed May  2 15:46:34 2012//
+/libgen.h/1.1/Wed May  2 15:46:34 2012//
+/malloc.h/1.1/Wed May  2 15:46:34 2012//
+/math.h/1.1/Wed May  2 15:46:34 2012//
+/obstack.h/1.1/Wed May  2 15:46:34 2012//
+/pthread.h/1.1/Wed May  2 15:46:34 2012//
+/reg_types.h/1.1/Wed May  2 15:46:34 2012//
+/regex.h/1.1/Wed May  2 15:46:34 2012//
+/stdio.h/1.1/Wed May  2 15:46:34 2012//
+/stdio_tag.h/1.1/Wed May  2 15:46:34 2012//
+/stdlib.h/1.1/Wed May  2 15:46:34 2012//
+/string.h/1.1/Wed May  2 15:46:34 2012//
+/strings.h/1.1/Wed May  2 15:46:34 2012//
+/sym.h/1.1/Wed May  2 15:46:34 2012//
+/testing.h/1.1/Wed May  2 15:46:34 2012//
+/time.h/1.1/Wed May  2 15:46:34 2012//
+/tinfo.h/1.1/Wed May  2 15:46:34 2012//
+/unistd.h/1.1/Wed May  2 15:46:34 2012//
+/widec.h/1.1/Wed May  2 15:46:34 2012//
+D/X11////
+D/Xm////
+D/ansi////
+D/arch////
+D/arpa////
+D/bsd////
+D/hsfs////
+D/internal////
+D/machine////
+D/netdnet////
+D/netinet////
+D/pixrect////
+D/rpc////
+D/rpcsvc////
+D/sparc////
+D/sundev////
+D/sunwindow////
+D/sys////
+D/types////

@@ -3554,8 +3554,15 @@ m68hc11_gen_movhi (insn, operands)
                && (MEM_VOLATILE_P (to) == 0
                    || m68hc11_small_indexed_indirect_p (to, HImode) == 0))
         {
+          if (TARGET_M68S12X)
+          {
+            output_asm_insn ("clrw\t%0", operands);
+          }
+          else
+          {
           output_asm_insn ("clr\t%h0", operands);
           output_asm_insn ("clr\t%b0", operands);
+          }
         }
       else
 	{

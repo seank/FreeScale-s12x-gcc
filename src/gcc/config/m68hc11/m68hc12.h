@@ -19,11 +19,13 @@ along with GNU CC; see the file COPYING.  If not, write to
 the Free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
-/* Compile and assemble for a 68hc12 unless there is a -m68hc11 option.  */
+/* Default to compile and assemble for a 68hc12 */
 #define ASM_SPEC                                                \
 "%{m68hc11:-m68hc11}"                                           \
+"%{m6812:-m68hc12}"                                         \
 "%{m68hcs12:-m68hcs12}"                                         \
-"%{!m68hc11:%{!m68hcs12:-m68hc12}}"
+"%{m9s12x:-mm9s12x}"                                         \
+"%{!m68hc11:%{!m68hcs12:%{!m9s12x:-m68hc12}}}"
 #define LIB_SPEC       ""
 #define CC1_SPEC       ""
 
@@ -31,19 +33,23 @@ Boston, MA 02111-1307, USA.  */
    emulation option.  This can be overriden by -Wl option of gcc.  */
 #define LINK_SPEC                                               \
 "%{m68hc11:-m m68hc11elf}"                                      \
+"%{m9s12x:-m m9s12xelf}"                                     \
 "%{m68hcs12:-m m68hc12elf}"                                     \
-"%{!m68hc11:%{!m68hcs12:-m m68hc11elf}} %{mrelax:-relax}"
+"%{!m68hc11:%{!m68hcs12:%{!m9s12x:-m m68hc11elf}} %{mrelax:-relax}"
 
 #define CPP_SPEC  \
 "%{mshort:-D__HAVE_SHORT_INT__ -D__INT__=16}\
  %{!mshort:-D__INT__=32}\
  %{m68hc11:-Dmc6811 -DMC6811 -Dmc68hc11}\
- %{!m68hc11:%{!m68hc12:-Dmc6812 -DMC6812 -Dmc68hc12}}\
+ %{m68hc12:-Dmc6812 -DMC6812 -Dmc68hc12}\
+ %{m9s12x:-Dmc6812 -DMC6812 -Dmc68hcs12 -Dm9s12x}\
  %{m68hcs12:-Dmc6812 -DMC6812 -Dmc68hcs12}\
- %{!m68hc11:-Dmc6812 -DMC6812 -Dmc68hc12}\
+ %{!m68hc11:%{!m68hc12:%{!m9s12x:-Dmc6812 -DMC6812 -Dmc68hc12 -m68hc12}}}\
  %{fshort-double:-D__HAVE_SHORT_DOUBLE__}"
 
 /* Default target_flags if no switches specified.  */
 #define TARGET_DEFAULT		(MASK_M6812)
 
 #define TARGET_M68HC12
+
+#define CPP_PREDEFINES		"-Dmc68hc1x -Dtarget12"
